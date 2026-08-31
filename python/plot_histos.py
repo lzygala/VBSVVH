@@ -36,6 +36,7 @@ from pathlib import Path
 import hist
 import matplotlib.pyplot as plt
 import mplhep as hep
+import math
 import yaml
 from plotting import ratio_plot, c2vonly_plot
 from axis_info import axis_to_column
@@ -116,14 +117,17 @@ def plot_c2vsignal(hists, category, year_str, outdir, region, style):
     first_hist = next(iter(hists.values()))
 
     # Project all raw histograms to 1D for this pt bin
-    histograms_to_plot = {}
+#    histograms_to_plot = {}
     for axis_label in hists.keys():
+        histograms_to_plot = {}
         for process, h in hists[axis_label].items():
             column = axis_to_column[axis_label]
             if not category in h.axes[1]:
                 continue
             h_proj = h[:, category].project(axis_label)
-
+            if h_proj.values().sum() == math.inf: 
+                print(f"Skipping {process} for axis {axis_label} due to infinite values.")
+                continue
             # if not "c2v" in process:
             #     continue
             histograms_to_plot[process] = h_proj
@@ -136,7 +140,6 @@ def plot_c2vsignal(hists, category, year_str, outdir, region, style):
 #        signals = ["vbs-hvv-c2v-1p0-c3-1p0", "vbs-hvv-c2v-1p0-c3-10p0", "vbs-hvv-c2v-1p5-c3-1p0"]
         signals = ["vbs-hvv-c2v-1p5-c3-1p0"]
         legend_title = f""
-
         fig, (ax, rax) = ratio_plot(
             histograms_to_plot,
             sigs=signals,

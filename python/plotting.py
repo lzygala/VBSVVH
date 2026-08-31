@@ -19,7 +19,8 @@ hep.style.use("CMS")
 def sci_2_before_decimal(x):
     if x == 0:
         return "0.00e+00"
-    
+    if math.isinf(x):
+        return math.inf
     exp = int(math.floor(math.log10(abs(x))))
     
     # Shift exponent so mantissa has 2 digits before decimal
@@ -141,6 +142,8 @@ def ratio_plot(
     plt.rcParams.update({"font.size": 24})
     ax.set_yscale('log')
 
+    if(tot_bkg is None):
+        return fig, (ax, rax)
     if(sum(tot_bkg.values()) == 0):
         return fig, (ax, rax)
     
